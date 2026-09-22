@@ -19,7 +19,7 @@ The application provides:
 ## Demo & Deployment
 
 - 🎥 **Demo Video:** [Watch the Demo](YOUR_DEMO_VIDEO_LINK)
-- 🚀 **Live Application:** [Open the Deployed App](YOUR_DEPLOYMENT_LINK)
+- 🚀 **Live Application:** [Open the Deployed App](https://hasamex-ai-case.streamlit.app/)
 - 💻 **Source Code:** [GitHub Repository](https://github.com/pujitha-mule/hasamex-case)
 
 > The application uses local Ollama models (`llama3.2:3b` and `nomic-embed-text`) for generation and embeddings.
