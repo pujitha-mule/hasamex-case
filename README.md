@@ -1,166 +1,100 @@
-# Hasamex – European Robotic Surgery Expert Call Analyzer
+# Hasamex AI Engineer Case Study
 
-A local AI-powered application for analyzing expert interviews on robotic surgery adoption across **France, Germany, and the UK**.
+A local AI application for analyzing expert-call transcripts about robotic surgery adoption across France, Germany, and the UK.
 
-The application answers interview-guide questions, extracts verbatim evidence with timestamps, identifies common themes and differences in perspective, and supports grounded Q&A across all three transcripts.
+The application provides:
 
-The system is designed to reduce hallucination by grounding generated answers in retrieved transcript evidence and validating quotes against the original source turns.
-
----
-
-## Overview
-
-This case study analyzes three expert-call transcripts:
-
-- 🇫🇷 **France** — Dr. Jean Martin, Head of Urology
-- 🇩🇪 **Germany** — Anna Keller, Former Hospital Procurement Director
-- 🇬🇧 **UK** — Dr. Emily Carter, Consultant Urologist
-
-The application provides four main capabilities:
-
-1. **Interview Guide Analysis**
-   - Answers the provided interview-guide questions for each expert.
-   - Retrieves relevant transcript turns before generating an answer.
-   - Displays verbatim supporting quotes and timestamps.
-
-2. **Themes & Differences**
-   - Identifies recurring themes across the three markets.
-   - Surfaces differences in emphasis, outlook, and purchasing considerations.
-   - Every displayed supporting quote is validated against the source transcript.
-
-3. **Cross-Transcript Q&A**
-   - Allows users to ask questions across all three transcripts.
-   - Retrieves relevant evidence from the complete transcript collection.
-   - Returns source-linked answers with expert, market, and timestamp context.
-   - If the transcripts do not contain sufficient evidence, the system fails closed rather than inventing an answer.
-
-4. **Transcript Evidence & Evaluation**
-   - Browse source transcript turns directly.
-   - Inspect retrieved evidence.
-   - View runtime/token metrics and evaluation results.
+- Interview-guide question answering for each expert
+- Verbatim quotes with timestamps
+- Cross-transcript Q&A
+- Common themes
+- Differences and perspectives
+- Grounded evidence retrieval
+- Quote and timestamp validation
+- A small gold-set evaluation
+- A hallucination/grounding test
 
 ---
 
-## Architecture
-
-```text
-                         ┌──────────────────────┐
-                         │   Expert Transcripts │
-                         │  France / Germany / UK│
-                         └──────────┬───────────┘
-                                    │
-                                    ▼
-                         ┌──────────────────────┐
-                         │ Deterministic Parser  │
-                         │ Speaker + Timestamp   │
-                         └──────────┬───────────┘
-                                    │
-                                    ▼
-                       ┌──────────────────────────┐
-                       │ Ollama Embeddings        │
-                       │ nomic-embed-text         │
-                       └────────────┬─────────────┘
-                                    │
-                                    ▼
-                       ┌──────────────────────────┐
-                       │       FAISS Index        │
-                       │ Per-expert + cross-call │
-                       └────────────┬─────────────┘
-                                    │
-                         ┌──────────┴───────────┐
-                         │                      │
-                         ▼                      ▼
-                Interview Guide          Cross-Transcript Q&A
-                         │                      │
-                         └──────────┬───────────┘
-                                    ▼
-                         ┌──────────────────────┐
-                         │ Ollama LLM           │
-                         │ llama3.2:3b          │
-                         └──────────┬───────────┘
-                                    │
-                                    ▼
-                         ┌──────────────────────┐
-                         │ Evidence Validation  │
-                         │ Quote + Timestamp    │
-                         └──────────┬───────────┘
-                                    │
-                                    ▼
-                         ┌──────────────────────┐
-                         │    Streamlit UI      │
-                         └──────────────────────┘
-
-##Why Local AI?
+## Why Local AI?
 
 The application uses Ollama for both embeddings and generation.
 
-Embedding model
-nomic-embed-text
+### Embedding model
+
+`nomic-embed-text`
 
 Used to create semantic vector representations of transcript turns.
 
-Generation model
-llama3.2:3b
+### Generation model
+
+`llama3.2:3b`
 
 Used for:
 
-Interview-guide answers
-Theme synthesis
-Cross-transcript Q&A
+- Interview-guide answers
+- Theme synthesis
+- Cross-transcript Q&A
 
 Both models run locally through Ollama.
 
 This means the current demo does not require an OpenAI API key or external LLM API credits.
 
-Retrieval
+---
 
-Each transcript turn is converted into a LangChain Document containing:
+## Retrieval
 
-Expert
-Market
-Timestamp
-Speaker
-Call ID
-Transcript text
+Each transcript turn is converted into a LangChain `Document` containing:
 
-The text is embedded using the local Ollama nomic-embed-text model and stored in FAISS.
+- Expert
+- Market
+- Timestamp
+- Speaker
+- Call ID
+- Transcript text
+
+The text is embedded using the local Ollama `nomic-embed-text` model and stored in FAISS.
 
 The application maintains:
 
-A cross-transcript FAISS index for global Q&A.
-A separate FAISS index for each expert for interview-guide extraction.
+- A cross-transcript FAISS index for global Q&A.
+- A separate FAISS index for each expert for interview-guide extraction.
 
 Questions are converted into embeddings and matched against transcript turns using semantic similarity.
 
 For example:
 
-Question:
-"What are the main barriers to adoption?"
+**Question:**
+
+> What are the main barriers to adoption?
 
 Retrieved evidence can include:
 
-France → capital budget approval
-Germany → cost and utilisation
-UK → funding and training capacity
+- France → capital budget approval
+- Germany → cost and utilisation
+- UK → funding and training capacity
 
 This allows semantically related evidence to be retrieved even when the wording of the question differs from the transcript.
 
-Grounding and Hallucination Reduction
+---
+
+# Grounding and Hallucination Reduction
 
 The application uses several safeguards to reduce unsupported answers.
 
-1. Deterministic transcript parsing
+## 1. Deterministic transcript parsing
 
 Transcript timestamps and speaker turns are extracted using deterministic parsing rather than asking the LLM to reconstruct the transcript structure.
 
-2. Retrieval grounding
+## 2. Retrieval grounding
 
 For interview-guide questions, the LLM receives retrieved transcript evidence rather than unrestricted access to outside knowledge.
 
-3. Structured output
+## 3. Structured output
 
 The guide extraction pipeline requests structured JSON containing:
 
+```json
 {
   "answer": "...",
   "quotes": [
@@ -205,8 +139,7 @@ Cross-Transcript Q&A
 
 Example:
 
-What are the main barriers to robotic surgery adoption
-across the three markets?
+What are the main barriers to robotic surgery adoption across the three markets?
 
 The answer can connect evidence from:
 
@@ -216,7 +149,7 @@ UK — funding and training capacity
 
 Each source retains its expert, market, and timestamp metadata.
 
-Hallucination test
+Hallucination Test
 
 Example:
 
@@ -225,12 +158,12 @@ What percentage of hospitals in France currently use robotic surgery?
 The transcripts do not provide this percentage, so the application should return:
 
 Not in transcripts.
+
 Themes and Differences
 
 The application surfaces cross-market observations such as:
 
 Common themes
-
 Adoption is increasing but uneven
 
 All three experts describe growing adoption while noting differences between larger, better-resourced institutions and smaller hospitals.
@@ -368,6 +301,7 @@ The current implementation is intentionally lightweight and suitable for a small
 For a larger production system, the architecture could evolve as follows:
 
 Current
+
 Local transcript files
         ↓
 Ollama embeddings
@@ -476,6 +410,7 @@ What percentage of hospitals in France currently use robotic surgery?
 Show:
 
 Not in transcripts.
+
 4. Themes & Differences
 
 Show:
@@ -511,17 +446,4 @@ B.Tech Computer Science and Engineering, VIT-AP
 Built as part of the Hasamex AI Engineer Case Study.
 
 
-### One important thing before you paste it
-
-Your current README should **not** say:
-
-```text
-TF-IDF
-
-or:
-
-gpt-4o-mini
-
-or:
-
-text-embedding-3-small                    
+This is the README content from the uploaded file, preserving its structure and the current **FAISS + Ollama** architecture. :contentReference[oaicite:1]{index=1} :contentReference[oaicite:2]{index=2}
