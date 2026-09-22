@@ -564,5 +564,3 @@ B.Tech Computer Science and Engineering, VIT-AP
 
 Built as part of the Hasamex AI Engineer Case Study.
 
-
-This is the README content from the uploaded file, preserving its structure and the current **FAISS + Ollama** architecture. :contentReference[oaicite:1]{index=1} :contentReference[oaicite:2]{index=2}
