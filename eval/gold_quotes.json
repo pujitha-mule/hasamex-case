@@ -1,0 +1,88 @@
+{
+  "Dr. Jean Martin": {
+    "adoption_current_state": {
+      "quote": "Adoption is growing, but it is still concentrated in larger academic hospitals and private centres with stronger capital budgets.",
+      "timestamp": "00:18"
+    },
+    "capital_budget_barrier": {
+      "quote": "The biggest issue is still capital budget approval.",
+      "timestamp": "01:20"
+    },
+    "roi_driver": {
+      "quote": "Very important. The clinical argument may get surgeons interested, but the finance team wants to understand utilisation, procedure volume, maintenance cost and whether the system will actually pay for itself.",
+      "timestamp": "02:18"
+    },
+    "training_importance": {
+      "quote": "Training matters, especially in the first year.",
+      "timestamp": "03:10"
+    },
+    "clinical_outcomes_position": {
+      "quote": "Clinical outcomes are necessary, but they are not enough on their own.",
+      "timestamp": "04:08"
+    },
+    "adoption_outlook": {
+      "quote": "I expect adoption to continue increasing, probably steadily rather than explosively.",
+      "timestamp": "05:07"
+    },
+    "purchase_timeline": {
+      "quote": "Six to twelve months is realistic once the hospital becomes serious.",
+      "timestamp": "06:08"
+    }
+  },
+  "Anna Keller": {
+    "adoption_current_state": {
+      "quote": "It is growing, but adoption is quite uneven.",
+      "timestamp": "00:16"
+    },
+    "cost_barrier": {
+      "quote": "Cost is the first barrier.",
+      "timestamp": "01:10"
+    },
+    "tco_focus": {
+      "quote": "We look at total cost of ownership, expected procedure volume, maintenance, service contracts and training requirements.",
+      "timestamp": "02:08"
+    },
+    "training_importance": {
+      "quote": "Very important operationally.",
+      "timestamp": "03:05"
+    },
+    "adoption_outlook": {
+      "quote": "Yes, but I would not expect a dramatic jump.",
+      "timestamp": "04:09"
+    },
+    "growth_expectation": {
+      "quote": "I would expect continued growth, but probably closer to high single digits or low double digits in procedure volumes rather than something like 20 percent across the whole market.",
+      "timestamp": "05:08"
+    },
+    "purchase_timeline": {
+      "quote": "Nine to eighteen months is common.",
+      "timestamp": "06:05"
+    }
+  },
+  "Dr. Emily Carter": {
+    "adoption_current_state": {
+      "quote": "Adoption is increasing, and in some larger NHS trusts robotic surgery is becoming standard for selected procedures.",
+      "timestamp": "00:14"
+    },
+    "training_barrier": {
+      "quote": "Funding is important, but I would say training capacity is just as important.",
+      "timestamp": "01:05"
+    },
+    "roi_position": {
+      "quote": "It matters, but the discussion is not always purely financial.",
+      "timestamp": "02:07"
+    },
+    "balanced_economics": {
+      "quote": "I would say economics and clinical strategy are balanced.",
+      "timestamp": "03:10"
+    },
+    "growth_expectation": {
+      "quote": "I could see procedure growth above 15 percent annually in some areas.",
+      "timestamp": "04:06"
+    },
+    "purchase_timeline": {
+      "quote": "Around six to nine months can happen if funding is already available.",
+      "timestamp": "05:04"
+    }
+  }
+}
