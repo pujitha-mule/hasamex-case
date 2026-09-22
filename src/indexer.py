@@ -1,88 +1,76 @@
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+"""
+Retrieval index for the Hasamex case study.
+
+Pipeline: transcript turns → per-expert FAISS index using Ollama embeddings.
+
+Each index wraps a LangChain FAISS vector store and exposes a small
+`similarity_search` interface so callers (extractor, qa, themes) do not
+need to know which vector backend is in use.
+"""
+
+from langchain.schema import Document
+from langchain_community.embeddings import OllamaEmbeddings
+from langchain_community.vectorstores import FAISS
 
 
-class LocalIndex:
-    """
-    Small local TF-IDF index.
-    No API, model download, or OpenAI credits required.
-    """
-
-    def __init__(self, documents):
-        self.documents = documents
-
-        self.vectorizer = TfidfVectorizer(
-            lowercase=True,
-            stop_words="english",
-            ngram_range=(1, 2)
-        )
-
-        texts = [d.page_content for d in documents]
-
-        self.matrix = self.vectorizer.fit_transform(texts)
-
-    def similarity_search(self, query, k=4):
-        query_vector = self.vectorizer.transform([query])
-
-        scores = cosine_similarity(
-            query_vector,
-            self.matrix
-        )[0]
-
-        ranked = scores.argsort()[::-1]
-
-        results = []
-
-        for i in ranked[:k]:
-            results.append(self.documents[i])
-
-        return results
+EMBED_MODEL = "nomic-embed-text"
+OLLAMA_BASE = "http://localhost:11434"
 
 
-def _to_doc(c):
-    """
-    Create a lightweight document object compatible
-    with the rest of the application.
-    """
+def _embeddings():
+    """Local embedding model served by Ollama. No API key required."""
+    return OllamaEmbeddings(
+        model=EMBED_MODEL,
+        base_url=OLLAMA_BASE,
+    )
 
-    from langchain.schema import Document
 
+def _to_doc(chunk):
+    """Convert a parser chunk into a LangChain Document with metadata."""
     return Document(
-        page_content=c["text"],
+        page_content=chunk["text"],
         metadata={
-            "expert": c["expert"],
-            "market": c["market"],
-            "timestamp": c["timestamp"],
-            "speaker": c["speaker"],
-            "call_id": c["call_id"],
-            "flag": c["flag"],
+            "expert": chunk["expert"],
+            "market": chunk["market"],
+            "timestamp": chunk["timestamp"],
+            "speaker": chunk["speaker"],
+            "call_id": chunk.get("call_id", ""),
+            "flag": chunk.get("flag", ""),
         },
     )
 
 
-def build_index(chunks):
+class LocalIndex:
     """
-    Build one local TF-IDF index.
+    Thin wrapper around a FAISS vector store.
+
+    Exposes `similarity_search(query, k)` — the same interface used
+    elsewhere in the app — so swapping backends later is a one-file change.
     """
 
+    def __init__(self, documents):
+        self.documents = documents
+        self.vectorstore = FAISS.from_documents(documents, _embeddings())
+
+    def similarity_search(self, query, k=4):
+        return self.vectorstore.similarity_search(query, k=k)
+
+
+def build_index(chunks):
+    """Cross-expert index over all non-interviewer turns."""
     docs = [
         _to_doc(c)
         for c in chunks
         if c["speaker"] != "Interviewer"
     ]
-
     return LocalIndex(docs)
 
 
 def build_expert_index(chunks_by_expert):
-    """
-    Build a separate local index for each expert.
-    """
-
+    """One FAISS index per expert, over their non-interviewer turns."""
     indexes = {}
 
     for expert, chunks in chunks_by_expert.items():
-
         docs = [
             _to_doc(c)
             for c in chunks
