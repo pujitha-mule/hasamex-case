@@ -89,7 +89,8 @@ The application provides four main capabilities:
                          ┌──────────────────────┐
                          │    Streamlit UI      │
                          └──────────────────────┘
-     Why Local AI?
+
+##Why Local AI?
 
 The application uses Ollama for both embeddings and generation.
 
